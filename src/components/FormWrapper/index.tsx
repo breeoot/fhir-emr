@@ -6,10 +6,10 @@ import { GroupItemProps } from 'sdc-qrf';
 import { FormWrapperProps } from '@beda.software/fhir-questionnaire/components';
 import { BaseQuestionnaireResponseFormPropsContext } from '@beda.software/fhir-questionnaire/contexts';
 import { RemoteDataResult } from '@beda.software/remote-data';
+import { isGroupWizard } from '@beda.software/web-item-controls/controls';
 
 import { groupComponent } from 'src/components/BaseQuestionnaireResponseForm/controls';
 import { FormFooter, FormFooterComponentProps } from 'src/components/BaseQuestionnaireResponseForm/FormFooter';
-import { isGroupWizard } from 'src/components/BaseQuestionnaireResponseForm/utils';
 
 import s from './FormWrapper.module.scss';
 
