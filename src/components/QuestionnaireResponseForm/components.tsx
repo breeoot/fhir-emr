@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 import { QuestionnaireResponseFormData } from 'sdc-qrf';
 
 import {
@@ -8,11 +8,17 @@ import {
     Props,
     QuestionnaireResponseForm as FHIRQuestionnaireResponseForm,
 } from '@beda.software/fhir-questionnaire/components';
+import {
+    ItemControlGroupItemReadonlyWidgetsContext,
+    ItemControlGroupItemWidgetsContext,
+    ItemControlQuestionItemReadonlyWidgetsContext,
+    ItemControlQuestionItemWidgetsContext,
+} from '@beda.software/fhir-questionnaire/contexts';
 
 import {
-    groupControlComponents,
+    groupControlComponents as defaultGroupControlComponents,
     itemComponents,
-    itemControlComponents,
+    itemControlComponents as defaultItemControlComponents,
 } from 'src/components/BaseQuestionnaireResponseForm/controls';
 import {
     groupControlComponents as readonlyGroupControlComponents,
@@ -55,6 +61,25 @@ export function QuestionnaireResponseForm({
     readOnly,
     customYupTests,
 }: QuestionnaireResponseFormProps) {
+    const ItemControlQuestionItemWidgetsFromContext = useContext(ItemControlQuestionItemWidgetsContext);
+    const ItemControlGroupItemWidgetsFromContext = useContext(ItemControlGroupItemWidgetsContext);
+
+    const mergedItemControlComponents = useMemo(
+        () => ({
+            ...defaultItemControlComponents,
+            ...ItemControlQuestionItemWidgetsFromContext,
+        }),
+        [ItemControlQuestionItemWidgetsFromContext],
+    );
+
+    const mergedGroupControlComponents = useMemo(
+        () => ({
+            ...defaultGroupControlComponents,
+            ...ItemControlGroupItemWidgetsFromContext,
+        }),
+        [ItemControlGroupItemWidgetsFromContext],
+    );
+
     const onEditHandler = useCallback(
         async (formData: QuestionnaireResponseFormData) => {
             const { questionnaireResponse } = fromQuestionnaireResponseFormData(formData);
@@ -104,8 +129,8 @@ export function QuestionnaireResponseForm({
             FormWrapper={FormWrapperProp ?? qrfFormWrapper}
             groupItemComponent={GroupItemComponent}
             widgetsByQuestionType={itemComponents}
-            widgetsByQuestionItemControl={itemControlQuestionItemComponents ?? itemControlComponents}
-            widgetsByGroupQuestionItemControl={itemControlGroupItemComponents ?? groupControlComponents}
+            widgetsByQuestionItemControl={itemControlQuestionItemComponents ?? mergedItemControlComponents}
+            widgetsByGroupQuestionItemControl={itemControlGroupItemComponents ?? mergedGroupControlComponents}
             onEdit={onEditProp ?? (onQRFUpdate ? onEditHandler : undefined)}
         />
     );
@@ -118,6 +143,25 @@ type ReadonlyQRFFormDataProps = {
 type ReadonlyQRFLoaderProps = Pick<Props, 'questionnaireLoader'> & Partial<Props>;
 
 export function ReadonlyQuestionnaireResponseForm(props: ReadonlyQRFFormDataProps | ReadonlyQRFLoaderProps) {
+    const ItemControlQuestionItemReadonlyWidgetsFromContext = useContext(ItemControlQuestionItemReadonlyWidgetsContext);
+    const ItemControlGroupItemReadonlyWidgetsFromContext = useContext(ItemControlGroupItemReadonlyWidgetsContext);
+
+    const mergedItemControlComponents = useMemo(
+        () => ({
+            ...readonlyItemControlComponents,
+            ...ItemControlQuestionItemReadonlyWidgetsFromContext,
+        }),
+        [ItemControlQuestionItemReadonlyWidgetsFromContext],
+    );
+
+    const mergedGroupControlComponents = useMemo(
+        () => ({
+            ...readonlyGroupControlComponents,
+            ...ItemControlGroupItemReadonlyWidgetsFromContext,
+        }),
+        [ItemControlGroupItemReadonlyWidgetsFromContext],
+    );
+
     if ('formData' in props) {
         return (
             <BaseQuestionnaireResponseForm
@@ -127,8 +171,8 @@ export function ReadonlyQuestionnaireResponseForm(props: ReadonlyQRFFormDataProp
                 FormWrapper={ReadonlyFormWrapper}
                 groupItemComponent={GroupItemComponent}
                 widgetsByQuestionType={readonlyItemComponents}
-                widgetsByQuestionItemControl={readonlyItemControlComponents}
-                widgetsByGroupQuestionItemControl={readonlyGroupControlComponents}
+                widgetsByQuestionItemControl={mergedItemControlComponents}
+                widgetsByGroupQuestionItemControl={mergedGroupControlComponents}
             />
         );
     }
@@ -142,10 +186,8 @@ export function ReadonlyQuestionnaireResponseForm(props: ReadonlyQRFFormDataProp
             FormWrapper={props.FormWrapper ?? ReadonlyFormWrapper}
             groupItemComponent={props.groupItemComponent ?? GroupItemComponent}
             widgetsByQuestionType={props.widgetsByQuestionType ?? readonlyItemComponents}
-            widgetsByQuestionItemControl={props.widgetsByQuestionItemControl ?? readonlyItemControlComponents}
-            widgetsByGroupQuestionItemControl={
-                props.widgetsByGroupQuestionItemControl ?? readonlyGroupControlComponents
-            }
+            widgetsByQuestionItemControl={props.widgetsByQuestionItemControl ?? mergedItemControlComponents}
+            widgetsByGroupQuestionItemControl={props.widgetsByGroupQuestionItemControl ?? mergedGroupControlComponents}
             readOnly={true}
         />
     );
