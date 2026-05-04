@@ -172,7 +172,8 @@ export function usePatientDocument(props: Props): {
         if (questionnaireResponse && questionnaireResponse.id) {
             const uri = `${questionnaireResponse.resourceType}/${questionnaireResponse.id}`;
 
-            provenanceResponse = await getProvenanceByEntity(uri);
+            const result = await getProvenanceByEntity(uri);
+            provenanceResponse = isSuccess(result) ? result : success([]);
         }
 
         if (isSuccess(provenanceResponse)) {
