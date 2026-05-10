@@ -6,6 +6,8 @@ import { Organization, ParametersParameter, Patient, Person, Practitioner, Quest
 import React, { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import type { QuestionnaireResponseFormProps } from 'src/hooks/questionnaire-response-form-data';
+
 import { formatError, RenderRemoteData, WithId } from '@beda.software/fhir-react';
 
 import { Text } from 'src/components';
@@ -31,6 +33,10 @@ export interface PatientDocumentProps {
     onSuccess?: (resource: QuestionnaireResponseFormSaveResponse) => void;
     autoSave?: boolean;
     qrDraftServiceType?: QuestionnaireResponseDraftService;
+    // Override the default loader (questionnaireIdLoader). Lets host apps
+    // inject augmented Questionnaires for specific ids without forking the
+    // route or duplicating draft/save plumbing.
+    questionnaireLoader?: QuestionnaireResponseFormProps['questionnaireLoader'];
 }
 
 interface PatientDocumentContentProps extends PatientDocumentProps {

@@ -48,6 +48,9 @@ export interface Props {
     encounterId?: string;
     launchContextParameters?: ParametersParameter[];
     onSuccess?: (resource: QuestionnaireResponseFormSaveResponse) => void;
+    // Override the default questionnaireIdLoader. Used to inject augmented
+    // Questionnaires (e.g. answerOption[] merged with Supabase catalog rows).
+    questionnaireLoader?: QuestionnaireResponseFormProps['questionnaireLoader'];
 }
 
 async function onFormSubmit(
@@ -105,7 +108,7 @@ function prepareFormInitialParams(
         questionnaireResponse,
     );
     const params: QuestionnaireResponseFormProps = {
-        questionnaireLoader: questionnaireIdLoader(questionnaireId),
+        questionnaireLoader: props.questionnaireLoader ?? questionnaireIdLoader(questionnaireId),
         launchContextParameters: [
             { name: 'Patient', resource: patient },
             {
